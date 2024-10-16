@@ -56,7 +56,7 @@ class Calculator(object):
         for char in string:
             if char == '(':
                 paranthesis_stack.append(char)
-                if prev_char == ")" or prev_char in '1234567890':
+                if (prev_char == ")" or prev_char in '1234567890') and index != 0:
                     newStr = newStr[:index + addedCharacters] + '*' + newStr[index + addedCharacters:] 
                     addedCharacters += 1
 
@@ -106,9 +106,43 @@ class Calculator(object):
         pass
 
 
-    def calculateExpression(self, string):
+    def calculateExpression(self, string: str):
+        #TODO Calculate expression - find parathesis and order of op
+        nr_parathesis = self.findNumParathesis(string)
+
+        work_string = string
+        if nr_parathesis != 0:
+            last_open_parath_index = work_string.rfind('(')
+            first_closed_paranth_index = work_string.find(')')
+
+            parath_expression = work_string[last_open_parath_index+1: first_closed_paranth_index]
+            print(parath_expression)
+            work_string = work_string[:last_open_parath_index+1] + str(self.calculateParathExpression(parath_expression)) + work_string[first_closed_paranth_index:] 
 
         pass
+
+
+    def findNumParathesis(self, string):
+        """
+        returns the number of parathesis pairs.
+        """
+        num_parathesis = 0
+        for char in string:
+            if char == "(":
+                num_parathesis += 1
+        
+        return num_parathesis
+
+
+    def calculateParathExpression(self, string: str):
+        work_string = string
+
+        for char in string:
+            if char in "*/":
+                print("paranth")
+                print(work_string.split(char)) 
+        
+        return work_string
 
 
     def calculateSingleOperation(self, first_num, second_num, operator):
