@@ -2,7 +2,7 @@ class Calculator(object):
 
     operators = "+-*/"
     paranthesis = "()"
-    valid_chars = "1234567890"
+    valid_chars = "1234567890."
 
     def read(self) :
         '''read input from stdin'''
@@ -14,8 +14,9 @@ class Calculator(object):
         #TODO implement me
         string = self.removeAllWhitespace(string)
         string = self.checkValidity(string)
-        result = self.calculateExpression(string)
-        print(result)
+        # result = self.calculateExpression(string)
+        # print(result)
+        self.calculateExpression(string)
         pass
 
 
@@ -87,12 +88,11 @@ class Calculator(object):
             
 
         if len(paranthesis_stack) == 0: 
-
-            print('valid paranthesis')
+            pass
         else:
             raise CalculatorException("Invalid parathesis")
 
-        print(newStr)
+        # print(newStr)
         return newStr
 
 
@@ -120,15 +120,42 @@ class Calculator(object):
         # for operator in 
         if nr_parathesis != 0:
             last_open_parath_index = work_string.rfind('(')
-            first_closed_paranth_index = work_string.find(')')
+            first_closed_paranth_index = work_string[last_open_parath_index:].find(')') + last_open_parath_index
 
             parath_expression = work_string[last_open_parath_index+1: first_closed_paranth_index]
-            print(parath_expression)
+            # print(parath_expression)
             work_string = work_string[:last_open_parath_index+1] + str(self.calculateParathExpression(parath_expression)) + work_string[first_closed_paranth_index:] 
+            work_string = self.handleParanthResults(work_string)
         else: 
             work_string = str(self.calculateParathExpression(work_string))
 
-        return work_string
+        if self.willCalculationStop(work_string):
+            print(work_string)
+            return work_string
+        else:
+            work_string = self.calculateExpression(work_string)
+            
+
+    def willCalculationStop(self, string: str):
+        minus_count = string.count("-")
+        if minus_count == 1 and string[0] == "-":
+            for op in "+/*":
+                if op in string:
+                    return False
+            return True
+        for op in self.operators:
+            if op in string:
+                return False
+        
+        return True
+
+
+    def handleParanthResults(self, string: str):
+        last_open_parath_index = string.rfind('(')
+        first_closed_paranth_index = string[last_open_parath_index:].find(')') + last_open_parath_index
+
+        return string[:last_open_parath_index] + string[last_open_parath_index + 1: first_closed_paranth_index] + string[first_closed_paranth_index + 1:]
+
 
 
     def findNumParathesis(self, string):
@@ -161,8 +188,8 @@ class Calculator(object):
                         op_end_index = index
                         work_string = work_string[:op_start_index] + self.calculateSingleOperation(first_num, second_num, curr_operator) + work_string[op_end_index:]
                         op_start_index = op_end_index + 1
-                        print("paranth")
-                        print(work_string)
+                        # print("paranth")
+                        # print(work_string)
                         break
 
                     is_first_num = False
@@ -229,23 +256,23 @@ class Calculator(object):
 
 
     def calculateSingleOperation(self, first_num, second_num, operator):
-        first_num = float(first_num)
-        second_num = float(second_num)
+        first_num = int(first_num)
+        second_num = int(second_num)
         result = 0
-        print(operator)
+        # print(operator)
 
         if operator == '*':
             result = first_num * second_num
-            print(f"{first_num} * {second_num} = {result}")
+            # print(f"{first_num} * {second_num} = {result}")
         elif operator == '/':
-            result = first_num / second_num
-            print(f"{first_num} / {second_num} = {result}")
+            result = first_num // second_num
+            # print(f"{first_num} / {second_num} = {result}")
         elif operator == '+':
             result = first_num + second_num
-            print(f"{first_num} + {second_num} = {result}")
+            # print(f"{first_num} + {second_num} = {result}")
         elif operator == '-':
             result = first_num - second_num
-            print(f"{first_num} - {second_num} = {result}")
+            # print(f"{first_num} - {second_num} = {result}")
         
         return str(result)
 
