@@ -152,7 +152,6 @@ class Calculator(object):
             op_start_index = 0
             op_end_index = 0
             index = 0
-            is_calculating = True
 
             for char in work_string:
                 if char in "*/":
@@ -185,14 +184,44 @@ class Calculator(object):
                     if "*" in work_string or "/" in work_string:
                         work_string = work_string[:op_start_index] + self.calculateSingleOperation(first_num, second_num, curr_operator) + work_string[op_end_index:]
                     
-                
+        work_string = self.calculateAdditionOrSubtraction(work_string)
         
         return work_string
 
+    def calculateAdditionOrSubtraction(self, string: str):
+        work_string = string
+        while "+" in work_string or "-" in work_string:
+            is_first_num = True
+            first_num = ""
+            second_num = ""
+            curr_operator = ""
+            index = 0
+            for char in work_string:
+                if is_first_num:
+                    if char in "-+":
+                        is_first_num = False
+                        curr_operator = char
+                    else:
+                        first_num += char
+                else:
+                    if char in "-+":
+                        work_string = self.calculateSingleOperation(first_num, second_num, curr_operator) + work_string[index:]
+                        break
+                    if index == len(work_string) - 1:
+                        second_num += char
+                        work_string = self.calculateSingleOperation(first_num, second_num, curr_operator)
+                        break
+
+                    second_num += char
+                index += 1
+
+        return work_string
+
+
 
     def calculateSingleOperation(self, first_num, second_num, operator):
-        first_num = int(first_num)
-        second_num = int(second_num)
+        first_num = float(first_num)
+        second_num = float(second_num)
         result = 0
         print(operator)
 
