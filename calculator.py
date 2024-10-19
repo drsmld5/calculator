@@ -1,4 +1,9 @@
 class Calculator(object):
+
+    operators = "+-*/"
+    paranthesis = "()"
+    valid_chars = "1234567890"
+
     def read(self) :
         '''read input from stdin'''
         return input('> ')
@@ -9,7 +14,8 @@ class Calculator(object):
         #TODO implement me
         string = self.removeAllWhitespace(string)
         string = self.checkValidity(string)
-        self.calculateExpression(string)
+        result = self.calculateExpression(string)
+        print(result)
         pass
 
 
@@ -47,7 +53,7 @@ class Calculator(object):
                                     (a*b)(a*b) -> (a*b)*(a*b) 
                                     someInt(a*b) -> someInt*(a*b) 
         """
-        operators = "*/-+"
+        # operators = "*/-+"
         paranthesis_stack = []
         prev_char = ''
         index = 0
@@ -56,12 +62,12 @@ class Calculator(object):
         for char in string:
             if char == '(':
                 paranthesis_stack.append(char)
-                if (prev_char == ")" or prev_char in '1234567890') and index != 0:
+                if (prev_char == ")" or prev_char in self.valid_chars) and index != 0:
                     newStr = newStr[:index + addedCharacters] + '*' + newStr[index + addedCharacters:] 
                     addedCharacters += 1
 
                 try:
-                    if string[index + 1] in operators:
+                    if string[index + 1] in self.operators:
                         raise CalculatorException("Invalid operator position in parahtesis")
                 except IndexError:
                     raise CalculatorException("Invalid parathesis")
@@ -70,7 +76,7 @@ class Calculator(object):
                     raise CalculatorException("Invalid parathesis")
                 elif prev_char == '(':
                     raise CalculatorException("Empty Parthesis")
-                elif prev_char in operators:
+                elif prev_char in self.operators:
                     raise CalculatorException("Invalid operator position in parahtesis")
 
                 paranthesis_stack.pop()
@@ -91,13 +97,13 @@ class Calculator(object):
 
 
     def checkCharacterContentValidity(self, string):
-        valid_characters_list = "0123456789"
-        valid_parathesis_list = "()"
-        valid_operators = "*/+-"
+        # valid_characters_list = "0123456789"
+        # valid_parathesis_list = "()"
+        # valid_operators = "*/+-"
         index = 0
         for char in string:
-            if char in valid_characters_list or char in valid_operators or char in valid_parathesis_list:
-                if ((index == 0 or index == len(string) - 1) and char in valid_operators):
+            if char in self.valid_chars or char in self.operators or char in self.paranthesis:
+                if ((index == 0 or index == len(string) - 1) and char in self.operators):
                     raise CalculatorException("Expression cannot begin or end with an operator")
             else: 
                 raise CalculatorException("Expression contains characters which are not accepted")
@@ -111,6 +117,7 @@ class Calculator(object):
         nr_parathesis = self.findNumParathesis(string)
 
         work_string = string
+        # for operator in 
         if nr_parathesis != 0:
             last_open_parath_index = work_string.rfind('(')
             first_closed_paranth_index = work_string.find(')')
@@ -119,7 +126,7 @@ class Calculator(object):
             print(parath_expression)
             work_string = work_string[:last_open_parath_index+1] + str(self.calculateParathExpression(parath_expression)) + work_string[first_closed_paranth_index:] 
 
-        pass
+        return work_string
 
 
     def findNumParathesis(self, string):
@@ -136,25 +143,68 @@ class Calculator(object):
 
     def calculateParathExpression(self, string: str):
         work_string = string
+        is_first_num = True
+        first_num = ""
+        second_num = ""
+        curr_operator = ""
+        op_start_index = 0
+        op_end_index = 0
+        index = 0
 
-        for char in string:
-            if char in "*/":
-                print("paranth")
-                print(work_string.split(char)) 
+        while "*" in work_string or "/" in work_string:
+            is_first_num = True
+            first_num = ""
+            second_num = ""
+            curr_operator = ""
+            op_start_index = 0
+            op_end_index = 0
+            index = 0
+
+            for char in work_string:
+                if char in "*/":
+                    if not is_first_num:
+                        op_end_index = index
+                        work_string = work_string[:op_start_index] + self.calculateSingleOperation(first_num, second_num, curr_operator) + work_string[op_end_index:]
+                        op_start_index = op_end_index + 1
+                        print("paranth")
+                        print(work_string)
+                        break
+
+                    is_first_num = False
+                    curr_operator = char
+                elif is_first_num:
+                    first_num += char
+                else:
+                    second_num += char
+                index += 1
+
+                if (index == len(work_string)):
+                    work_string = self.calculateSingleOperation(first_num, second_num, curr_operator)
+                
         
         return work_string
 
 
     def calculateSingleOperation(self, first_num, second_num, operator):
+        first_num = int(first_num)
+        second_num = int(second_num)
+        result = 0
+        print(operator)
+
         if operator == '*':
-            return first_num * second_num
+            result = first_num * second_num
+            print(f"{first_num} * {second_num} = {result}")
         elif operator == '/':
-            return first_num / second_num
+            result = first_num / second_num
+            print(f"{first_num} / {second_num} = {result}")
         elif operator == '+':
-            return first_num + second_num
+            result = first_num + second_num
+            print(f"{first_num} + {second_num} = {result}")
         elif operator == '-':
-            return first_num - second_num
-        pass
+            result = first_num - second_num
+            print(f"{first_num} - {second_num} = {result}")
+        
+        return str(result)
 
 
 
