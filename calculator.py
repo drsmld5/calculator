@@ -125,6 +125,8 @@ class Calculator(object):
             parath_expression = work_string[last_open_parath_index+1: first_closed_paranth_index]
             print(parath_expression)
             work_string = work_string[:last_open_parath_index+1] + str(self.calculateParathExpression(parath_expression)) + work_string[first_closed_paranth_index:] 
+        else: 
+            work_string = str(self.calculateParathExpression(work_string))
 
         return work_string
 
@@ -190,12 +192,16 @@ class Calculator(object):
 
     def calculateAdditionOrSubtraction(self, string: str):
         work_string = string
+        is_result_negative = False
         while "+" in work_string or "-" in work_string:
             is_first_num = True
             first_num = ""
             second_num = ""
             curr_operator = ""
             index = 0
+             
+            if is_result_negative: break
+
             for char in work_string:
                 if is_first_num:
                     if char in "-+":
@@ -210,6 +216,9 @@ class Calculator(object):
                     if index == len(work_string) - 1:
                         second_num += char
                         work_string = self.calculateSingleOperation(first_num, second_num, curr_operator)
+                        first_char = work_string[0]
+                        if first_char == "-":
+                            is_result_negative = True
                         break
 
                     second_num += char
