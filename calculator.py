@@ -143,13 +143,6 @@ class Calculator(object):
 
     def calculateParathExpression(self, string: str):
         work_string = string
-        is_first_num = True
-        first_num = ""
-        second_num = ""
-        curr_operator = ""
-        op_start_index = 0
-        op_end_index = 0
-        index = 0
 
         while "*" in work_string or "/" in work_string:
             is_first_num = True
@@ -159,6 +152,7 @@ class Calculator(object):
             op_start_index = 0
             op_end_index = 0
             index = 0
+            is_calculating = True
 
             for char in work_string:
                 if char in "*/":
@@ -174,12 +168,23 @@ class Calculator(object):
                     curr_operator = char
                 elif is_first_num:
                     first_num += char
+                    if char in "+-":
+                        first_num = ""
+                        op_start_index = index + 1
                 else:
-                    second_num += char
+                    if char in "+-":
+                        op_end_index = index
+                        work_string = work_string[:op_start_index] + self.calculateSingleOperation(first_num, second_num, curr_operator) + work_string[op_end_index:]
+                        break
+                    else:
+                        second_num += char
                 index += 1
 
-                if (index == len(work_string)):
-                    work_string = self.calculateSingleOperation(first_num, second_num, curr_operator)
+                if index == len(work_string):
+                    op_end_index = index
+                    if "*" in work_string or "/" in work_string:
+                        work_string = work_string[:op_start_index] + self.calculateSingleOperation(first_num, second_num, curr_operator) + work_string[op_end_index:]
+                    
                 
         
         return work_string
